@@ -16,6 +16,7 @@
                 frames: "@",
                 framesPerRow: "@",
                 repeat: "@",
+                run: "@",
                 speed: "@"
             },
 
@@ -27,6 +28,7 @@
                     frames,
                     framesPerRow = 0,
                     repeat = true,
+                    run = true,
                     speed = 100;
 
                 // Keeps track of the current x and y positions of the sprite.
@@ -45,6 +47,7 @@
                     frameHeight = parseInt($scope.frameHeight, 10);
                     frames = parseInt($scope.frames, 10);
                     repeat = $scope.repeat == 'true';
+                    run = $scope.run == 'true';
                     speed = $scope.speed
                     framesPerRow = $scope.framesPerRow;
 
@@ -56,7 +59,9 @@
                         "backgroundPosition": "0px 0px"
                     });
 
-                    animate();
+                    if (run) {
+                      animate();
+                    }
                 }
 
                 var animationInterval = null;
@@ -65,7 +70,6 @@
                  * Animates the sprite.
                  */
                 function animate() {
-
                     /**
                      * Returns whether the sprite animation has completed or not.
                      */
@@ -74,9 +78,8 @@
 
                         if (framesPerRow) {
                             var numRows = frames / framesPerRow
-
-                            if (spritePosition.x >= (framesPerRow - 1) * frameWidth &&
-                                spritePosition.y >= numRows * frameHeight) {
+                            if (spritePosition.x >= (framesPerRow-1) * frameWidth &&
+                                spritePosition.y >= (numRows-1) * frameHeight) {
                                 toReturn = true;
                             }
 
@@ -105,7 +108,6 @@
                         } else {
                             // Increment the X position
                             spritePosition.x += frameWidth;
-
                             // Check if we should move to the next row
                             if (framesPerRow != null && spritePosition.x + frameWidth > frameWidth * framesPerRow) {
                                 spritePosition.x = 0;
@@ -119,6 +121,14 @@
                     $window.clearInterval(animationInterval);
                     // $interval.cancel(animationInterval);
                 });
+
+                $scope.$watch(function() { return $scope.run; },function(newValue,oldValue) {
+                  if (!JSON.parse(oldValue) && JSON.parse(newValue)) {
+                    spritePosition.x = 0
+                    spritePosition.y = 0
+                    animate();
+                  }
+                })
 
                 init();
             }
